@@ -1,0 +1,414 @@
+[
+    {
+        "id": "6bdbabf07cfdd88a",
+        "type": "tab",
+        "label": "Fluxo 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "62d535766099c15b",
+        "type": "ui_form",
+        "z": "6bdbabf07cfdd88a",
+        "name": "",
+        "label": "",
+        "group": "71ed3348f0ebb6d2",
+        "order": 0,
+        "width": "0",
+        "height": "0",
+        "options": [
+            {
+                "label": "Card UID",
+                "value": "uid",
+                "type": "number",
+                "required": true,
+                "rows": null
+            },
+            {
+                "label": "Name",
+                "value": "name",
+                "type": "text",
+                "required": true,
+                "rows": null
+            },
+            {
+                "label": "Access permitted?",
+                "value": "access",
+                "type": "switch",
+                "required": false,
+                "rows": null
+            }
+        ],
+        "formValue": {
+            "uid": "",
+            "name": "",
+            "access": false
+        },
+        "payload": "",
+        "submit": "Submit",
+        "cancel": "Cancel",
+        "topic": "topic",
+        "topicType": "msg",
+        "splitLayout": "",
+        "className": "",
+        "x": 250,
+        "y": 260,
+        "wires": [
+            [
+                "ada93462644125c0"
+            ]
+        ]
+    },
+    {
+        "id": "fb50a23602f08bb8",
+        "type": "debug",
+        "z": "6bdbabf07cfdd88a",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 760,
+        "y": 340,
+        "wires": []
+    },
+    {
+        "id": "d2fc284a2166550b",
+        "type": "mqtt in",
+        "z": "6bdbabf07cfdd88a",
+        "name": "",
+        "topic": "info/user",
+        "qos": "2",
+        "datatype": "auto-detect",
+        "broker": "297475ec51268976",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 240,
+        "y": 540,
+        "wires": [
+            [
+                "c309912b26161fae",
+                "3bdf04d40a4e3934",
+                "9024ed3e1c086ec0"
+            ]
+        ]
+    },
+    {
+        "id": "83efd3825bab5790",
+        "type": "debug",
+        "z": "6bdbabf07cfdd88a",
+        "name": "Show User",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 770,
+        "y": 760,
+        "wires": []
+    },
+    {
+        "id": "c309912b26161fae",
+        "type": "function",
+        "z": "6bdbabf07cfdd88a",
+        "name": "Find User",
+        "func": "let fs = global.get('fs')\n\nfunction buscarNomePorUid(arquivo, uid) {\n    try {\n        const linhas = arquivo.split('\\n');\n        \n        for (const linha of linhas) {\n            try {\n                const objeto = JSON.parse(linha);\n\n                if (objeto.uid === uid) {\n                    if (objeto.access) {\n                        objeto.txt = \"(Authorized)\";\n                    }\n                    else {\n                        objeto.txt = \"(Not Authorized)\";\n                    }\n                    return objeto;\n                }\n            } catch (erro) {}\n        }\n\n        return null;\n    } catch (erro) {\n        console.error('Erro ao ler o arquivo:', erro);\n        return null;\n    }\n}\n\nconst resultado = buscarNomePorUid(flow.get(\"database\"), msg.payload.value);\nmsg.payload = resultado;\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 500,
+        "y": 680,
+        "wires": [
+            [
+                "83efd3825bab5790",
+                "e0688f4fe82d9f7a",
+                "d4c7b0e303d1998d"
+            ]
+        ]
+    },
+    {
+        "id": "3bdf04d40a4e3934",
+        "type": "file in",
+        "z": "6bdbabf07cfdd88a",
+        "name": "",
+        "filename": "db_sh.json",
+        "filenameType": "str",
+        "format": "utf8",
+        "chunk": false,
+        "sendError": false,
+        "encoding": "utf8",
+        "allProps": false,
+        "x": 510,
+        "y": 540,
+        "wires": [
+            [
+                "eb5c5a8d65cda717",
+                "05b8bb7a8f21ea95"
+            ]
+        ]
+    },
+    {
+        "id": "9a759e02f0b4a8d9",
+        "type": "file",
+        "z": "6bdbabf07cfdd88a",
+        "name": "",
+        "filename": "db_sh.json",
+        "filenameType": "str",
+        "appendNewline": true,
+        "createDir": true,
+        "overwriteFile": "false",
+        "encoding": "utf8",
+        "x": 770,
+        "y": 260,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "eb5c5a8d65cda717",
+        "type": "change",
+        "z": "6bdbabf07cfdd88a",
+        "name": "Read File",
+        "rules": [
+            {
+                "t": "set",
+                "p": "database",
+                "pt": "flow",
+                "to": "payload",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 760,
+        "y": 540,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "05b8bb7a8f21ea95",
+        "type": "debug",
+        "z": "6bdbabf07cfdd88a",
+        "name": "Show File",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 760,
+        "y": 420,
+        "wires": []
+    },
+    {
+        "id": "e0688f4fe82d9f7a",
+        "type": "function",
+        "z": "6bdbabf07cfdd88a",
+        "name": "Access Control",
+        "func": "if (msg.payload != null && msg.payload.access) {\n    msg.payload = msg.payload.name;\n}\nelse {\n    msg.payload = \"nok\";   \n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 780,
+        "y": 680,
+        "wires": [
+            [
+                "b2f5de4f1929c710",
+                "0d1ab79e236a48f7"
+            ]
+        ]
+    },
+    {
+        "id": "b2f5de4f1929c710",
+        "type": "mqtt out",
+        "z": "6bdbabf07cfdd88a",
+        "name": "",
+        "topic": "info/access",
+        "qos": "",
+        "retain": "false",
+        "respTopic": "",
+        "contentType": "",
+        "userProps": "",
+        "correl": "",
+        "expiry": "",
+        "broker": "297475ec51268976",
+        "x": 1050,
+        "y": 680,
+        "wires": []
+    },
+    {
+        "id": "9024ed3e1c086ec0",
+        "type": "debug",
+        "z": "6bdbabf07cfdd88a",
+        "name": "Topic Value",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 510,
+        "y": 760,
+        "wires": []
+    },
+    {
+        "id": "0d1ab79e236a48f7",
+        "type": "debug",
+        "z": "6bdbabf07cfdd88a",
+        "name": "Output Data",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 1050,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "ada93462644125c0",
+        "type": "function",
+        "z": "6bdbabf07cfdd88a",
+        "name": "Add Field",
+        "func": "msg.payload[\"pass\"] = true;\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 500,
+        "y": 260,
+        "wires": [
+            [
+                "fb50a23602f08bb8",
+                "9a759e02f0b4a8d9"
+            ]
+        ]
+    },
+    {
+        "id": "27b6d0e39b6319ad",
+        "type": "ui_toast",
+        "z": "6bdbabf07cfdd88a",
+        "position": "top right",
+        "displayTime": "3",
+        "highlight": "",
+        "sendall": false,
+        "outputs": 0,
+        "ok": "OK",
+        "cancel": "",
+        "raw": false,
+        "className": "",
+        "topic": "An user arrived!",
+        "name": "User Pop-up",
+        "x": 950,
+        "y": 860,
+        "wires": []
+    },
+    {
+        "id": "d4c7b0e303d1998d",
+        "type": "function",
+        "z": "6bdbabf07cfdd88a",
+        "name": "function 1",
+        "func": "if(msg.payload == null) {\n    msg.payload = \"Not in the system!\";\n}\nelse {\n    msg.payload = msg.payload.name + \" \" + msg.payload.txt;\n}\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 760,
+        "y": 860,
+        "wires": [
+            [
+                "27b6d0e39b6319ad"
+            ]
+        ]
+    },
+    {
+        "id": "8d05c204e2c65dd9",
+        "type": "ui_spacer",
+        "z": "6bdbabf07cfdd88a",
+        "name": "spacer",
+        "group": "71ed3348f0ebb6d2",
+        "order": 1,
+        "width": 1,
+        "height": 1
+    },
+    {
+        "id": "71ed3348f0ebb6d2",
+        "type": "ui_group",
+        "name": "Home",
+        "tab": "d924fffbe802dd24",
+        "order": 1,
+        "disp": true,
+        "width": "8",
+        "collapse": false,
+        "className": ""
+    },
+    {
+        "id": "297475ec51268976",
+        "type": "mqtt-broker",
+        "name": "MyBroker",
+        "broker": "localhost",
+        "port": "1883",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": false,
+        "protocolVersion": "4",
+        "keepalive": "60",
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "d924fffbe802dd24",
+        "type": "ui_tab",
+        "name": "AccessHub",
+        "icon": "dashboard",
+        "disabled": false,
+        "hidden": false
+    }
+]
